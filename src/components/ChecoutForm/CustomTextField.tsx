@@ -1,14 +1,13 @@
 import React from 'react';
 import {TextField, Grid} from '@material-ui/core';
 import {useFormContext, Controller} from "react-hook-form";
-
 export type CustomTextFieldPropsType = {
     name: string
     label: string
 }
 
 
-export const FromInput = ({name, label}: CustomTextFieldPropsType) => {
+export const FormInput = ({name, label}: CustomTextFieldPropsType) => {
 
     const {control} = useFormContext()
 

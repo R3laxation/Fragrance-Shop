@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {InputLabel, Select, MenuItem, Button, Grid, Typography} from "@material-ui/core";
 import {useForm, FormProvider} from "react-hook-form";
-import {FromInput} from "./CustomTextField";
-import {commerce} from '../../../lib/commerce'
-import {CheckoutToken} from "./Checkout";
+import {commerce} from '../../lib/commerce'
+import {CheckoutToken} from "./Checkout/Checkout";
 import {Price} from "@chec/commerce.js/types/price";
 import {Link} from "react-router-dom";
+import {FormInput} from './CustomTextField';
 
 type AddressFormPropsType = {
     checkoutToken: CheckoutToken | null
@@ -82,12 +82,12 @@ export const AddressForm = ({checkoutToken, next}: AddressFormPropsType) => {
             <FormProvider {...methods}>
                 <form onSubmit={methods.handleSubmit((data) => next({...data, shippingSubdivision, shippingOption}))}>
                     <Grid container spacing={3}>
-                        <FromInput label='First Name' name='firstName'/>
-                        <FromInput label='Last Name' name='lastName'/>
-                        <FromInput label='Address' name='address'/>
-                        <FromInput label='Email' name='email'/>
-                        <FromInput label='City' name='city'/>
-                        <FromInput label='ZIP/Postal code' name='zip'/>
+                        <FormInput label='First Name' name='firstName'/>
+                        <FormInput label='Last Name' name='lastName'/>
+                        <FormInput label='Address' name='address'/>
+                        <FormInput label='Email' name='email'/>
+                        <FormInput label='City' name='city'/>
+                        <FormInput label='ZIP/Postal code' name='zip'/>
                         <Grid item xs={12} sm={6}>
                             <InputLabel>Shipping Country</InputLabel>
                             <Select value={shippingCountry} fullWidth
