@@ -14,6 +14,7 @@ export const FormInput = ({name, label}: CustomTextFieldPropsType) => {
     return (
         <Grid item xs={12} sm={6}>
             <Controller
+                defaultValue=''
                 control={control}
                 name={name}
                 rules={{ required: true }}

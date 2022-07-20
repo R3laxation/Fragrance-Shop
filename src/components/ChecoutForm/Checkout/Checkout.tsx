@@ -1,5 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {Paper, Stepper, Step, StepLabel, Typography, CircularProgress, Divider, Button} from "@material-ui/core";
+import {
+    Button,
+    CircularProgress,
+    CssBaseline,
+    Divider,
+    Paper,
+    Step,
+    StepLabel,
+    Stepper,
+    Typography
+} from "@material-ui/core";
 import useStyles from './styles'
 import {AddressForm} from "../AddressForm";
 import {PaymentForm} from '../PaymentForm';
@@ -11,6 +21,9 @@ import {Gateway} from "@chec/commerce.js/types/gateway";
 import {ShippingMethod} from "@chec/commerce.js/types/shipping-method";
 import {Live} from "@chec/commerce.js/types/live";
 import {CheckoutTokenLineItem} from "@chec/commerce.js/types/checkout-token";
+import {CheckoutCapture} from "@chec/commerce.js/types/checkout-capture";
+import {Link, useNavigate} from "react-router-dom";
+
 
 export interface CheckoutToken {
     id: string;
@@ -55,15 +68,19 @@ export interface CheckoutToken {
 
 type CheckoutPropsType = {
     cart: CartType
+    order: any
+    onCaptureCheckout: (checkoutTokenId: string, newOrder: CheckoutCapture) => void
+    error: string
 }
 
 const steps = ['Shipping address', 'Payment details']
 
-export const Checkout = ({cart}: CheckoutPropsType) => {
-
+export const Checkout = ({cart, order, onCaptureCheckout, error}: CheckoutPropsType) => {
+    const navigate = useNavigate()
     const [activeStep, setActiveStep] = useState(0)
-    const [checkoutToken, setCheckoutToken] = useState<CheckoutToken | null>(null)
+    const [checkoutToken, setCheckoutToken] = useState<CheckoutToken>({} as CheckoutToken)
     const [shippingData, setShippingData] = useState({})
+    const [isFinished, setIsFinished] = useState(false)
 
     useEffect(() => {
         const generateToken = async () => {
@@ -71,7 +88,7 @@ export const Checkout = ({cart}: CheckoutPropsType) => {
                 const token = await commerce.checkout.generateToken(cart.id, {type: 'cart'})
                 setCheckoutToken(token)
             } catch (error) {
-
+                navigate('/')
             }
         }
         generateToken()
@@ -85,18 +102,59 @@ export const Checkout = ({cart}: CheckoutPropsType) => {
         nextStep()
     }
 
-    const Form = () => activeStep === 0
-        ? <AddressForm checkoutToken={checkoutToken} next={next}/>
-        : <PaymentForm shippingData={shippingData} checkoutToken={checkoutToken} backStep={backStep}/>
+
 
     const s = useStyles()
 
-    const Confirmation = () => (
-        <div>Confirmation</div>
-    )
+    const timeout = () => {
+        setTimeout(() =>{
+            setIsFinished(true)
+        }, 3000)
+    }
+
+    const Form = () => activeStep === 0
+        ? <AddressForm checkoutToken={checkoutToken} next={next}/>
+        : <PaymentForm shippingData={shippingData} checkoutToken={checkoutToken} nextStep={nextStep} backStep={backStep}
+                       onCaptureCheckout={onCaptureCheckout} timeout={timeout}/>
+
+    let Confirmation = () => order.customer ? (
+        <>
+            <div>
+                <Typography variant={'h5'}>Thank you for your purchase, {order.customer.firstname} {order.customer.lastname}</Typography>
+                <Divider className={s.divider}/>
+                <Typography variant={'subtitle2'}>Order ref: {order.customer_reference}</Typography>
+            </div>
+            <br/>
+            <Button component={Link} to='/' variant={'outlined'} type={'button'}>Back to home</Button>
+
+        </>
+    ) : isFinished ? (
+        <>
+            <div>
+                <Typography variant={'h5'}>Thank you for your purchase</Typography>
+                <Divider className={s.divider}/>
+            </div>
+            <br/>
+            <Button component={Link} to='/' variant={'outlined'} type={'button'}>Back to home</Button>
+
+        </>
+    ) : (
+        <div className={s.spinner}>
+            <CircularProgress/>
+        </div>
+)
+
+    if(error) {
+        <>
+            <Typography variant={'h5'}>Error: {error}</Typography>
+            <br/>
+            <Button component={Link} to='/' variant={'outlined'} type={'button'}>Back to home</Button>
+        </>
+    }
 
     return (
         <>
+            <CssBaseline/>
             <div className={s.toolbar}/>
             <main className={s.layout}>
                 <Paper className={s.paper}>

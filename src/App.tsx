@@ -9,7 +9,8 @@ import {ProductVariantGroup} from "@chec/commerce.js/types/product-variant-group
 import {Asset} from "@chec/commerce.js/types/asset";
 import {ProductAttribute} from "@chec/commerce.js/types/product-attribute";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-
+import {CheckoutCapture} from "@chec/commerce.js/types/checkout-capture";
+import {AxiosError} from "axios";
 
 
 export interface CartType {
@@ -107,39 +108,48 @@ const App = () => {
 
     const [products, setProducts] = useState([])
     const [cart, setCart] = useState<CartType>({} as CartType)
+    const [order, setOrder] = useState({})
+    const [errorMessage, setErrorMessage] = useState('')
 
 
     const fetchProducts = async () => {
         const {data} = await commerce.products.list()
         setProducts(data as [])
-
     }
-
     const fetchCart = async () => {
         const cart = await commerce.cart.retrieve()
         setCart(cart)
-
-
     }
-
     const handleAddToCart = async (productId: string, quantity: number) => {
         const {cart} = await commerce.cart.add(productId, quantity)
         setCart(cart)
     }
-
     const handeUpdateCartQty = async (productId: string, quantity: number) => {
         const {cart} = await commerce.cart.update(productId, {quantity})
         setCart(cart)
     }
-
     const handeRemoveFromCart = async (productId: string) => {
         const {cart} = await commerce.cart.remove(productId)
         setCart(cart)
     }
-
     const handleEmptyCart = async () => {
         const {cart} = await commerce.cart.empty()
         setCart(cart)
+    }
+    const refreshCart = async () => {
+        const newCart = await commerce.cart.refresh()
+        setCart(newCart)
+    }
+
+    const handleCaptureCheckout = async (checkoutTokenId: string, newOrder: CheckoutCapture) => {
+        try {
+            const incomingOrder = await commerce.checkout.capture(checkoutTokenId, newOrder)
+            setOrder(incomingOrder)
+            refreshCart()
+        } catch (err) {
+            const error = err as AxiosError
+            setErrorMessage(error.message)
+        }
     }
 
 
@@ -162,7 +172,11 @@ const App = () => {
                         handeRemoveFromCart={handeRemoveFromCart}
                         handleEmptyCart={handleEmptyCart}
                     />}></Route>
-                    <Route path={'/checkout'} element={<Checkout cart={cart}/>}></Route>
+                    <Route path={'/checkout'} element={<Checkout
+                        cart={cart} order={order}
+                        onCaptureCheckout={handleCaptureCheckout}
+                        error={errorMessage}/>}>
+                    </Route>
                 </Routes>
             </div>
         </BrowserRouter>
