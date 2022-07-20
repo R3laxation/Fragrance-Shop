@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/Fragrance-Shop/static/css/main.073c9b0a.css",
-    "main.js": "/Fragrance-Shop/static/js/main.13ad5d9e.js",
+    "main.js": "/Fragrance-Shop/static/js/main.1f0ccc0a.js",
     "static/media/1000647.png": "/Fragrance-Shop/static/media/1000647.58d8bbda69733e463df4.png",
     "index.html": "/Fragrance-Shop/index.html",
     "main.073c9b0a.css.map": "/Fragrance-Shop/static/css/main.073c9b0a.css.map",
-    "main.13ad5d9e.js.map": "/Fragrance-Shop/static/js/main.13ad5d9e.js.map"
+    "main.1f0ccc0a.js.map": "/Fragrance-Shop/static/js/main.1f0ccc0a.js.map"
   },
   "entrypoints": [
     "static/css/main.073c9b0a.css",
-    "static/js/main.13ad5d9e.js"
+    "static/js/main.1f0ccc0a.js"
   ]
 }
